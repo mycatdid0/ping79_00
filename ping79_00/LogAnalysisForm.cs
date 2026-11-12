@@ -71,9 +71,11 @@ namespace ping79_00
                             Text = text,
                             AccessibleName = text.Split('\r', '\n')[0]
                         };
-                        // Include room for the border and horizontal scrollbar.
-                        box.Height = checked(box.Lines.Length * box.Font.Height +
-                            SystemInformation.HorizontalScrollBarHeight + 8);
+                        // Include room for the border, internal padding, and horizontal scrollbar
+                        // so the last line is not clipped.
+                        int lineCount = Math.Max(1, box.Lines.Length);
+                        box.Height = checked(lineCount * (box.Font.Height + 1) +
+                            SystemInformation.HorizontalScrollBarHeight + 16);
                         resultsPanel.Controls.Add(box);
                     }
                     LayoutResults();
@@ -104,6 +106,7 @@ namespace ping79_00
 
         private void LayoutResults()
         {
+            resultsPanel.AutoScroll = true;
             int height = resultsPanel.Padding.Vertical;
             foreach (Control box in resultsPanel.Controls) height += box.Height + 8;
             int width = Math.Max(1, resultsPanel.Width - resultsPanel.Padding.Horizontal -
