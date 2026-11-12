@@ -24,6 +24,8 @@
             this.exitMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.ipInput = new System.Windows.Forms.TextBox();
             this.menuSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.logAnalysisMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.exitSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.start = new System.Windows.Forms.Button();
             this.startMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.status = new System.Windows.Forms.Label();
@@ -48,7 +50,7 @@
             // editIpMenu
             // 
             this.editIpMenu.Name = "editIpMenu";
-            this.editIpMenu.Size = new System.Drawing.Size(112, 22);
+            this.editIpMenu.Size = new System.Drawing.Size(126, 22);
             this.editIpMenu.Text = "IP 변경";
             this.editIpMenu.Click += new System.EventHandler(this.EditIp_Click);
             // 
@@ -65,7 +67,7 @@
             // exitMenu
             // 
             this.exitMenu.Name = "exitMenu";
-            this.exitMenu.Size = new System.Drawing.Size(112, 22);
+            this.exitMenu.Size = new System.Drawing.Size(126, 22);
             this.exitMenu.Text = "Exit";
             this.exitMenu.Click += new System.EventHandler(this.Exit_Click);
             // 
@@ -80,7 +82,19 @@
             // menuSeparator
             // 
             this.menuSeparator.Name = "menuSeparator";
-            this.menuSeparator.Size = new System.Drawing.Size(109, 6);
+            this.menuSeparator.Size = new System.Drawing.Size(123, 6);
+            // 
+            // logAnalysisMenu
+            // 
+            this.logAnalysisMenu.Name = "logAnalysisMenu";
+            this.logAnalysisMenu.Size = new System.Drawing.Size(126, 22);
+            this.logAnalysisMenu.Text = "로그 분석";
+            this.logAnalysisMenu.Click += new System.EventHandler(this.LogAnalysis_Click);
+            // 
+            // exitSeparator
+            // 
+            this.exitSeparator.Name = "exitSeparator";
+            this.exitSeparator.Size = new System.Drawing.Size(123, 6);
             // 
             // start
             // 
@@ -95,7 +109,7 @@
             // startMenu
             // 
             this.startMenu.Name = "startMenu";
-            this.startMenu.Size = new System.Drawing.Size(112, 22);
+            this.startMenu.Size = new System.Drawing.Size(126, 22);
             this.startMenu.Text = "Start";
             this.startMenu.Click += new System.EventHandler(this.StartMenu_Click);
             // 
@@ -122,7 +136,7 @@
             // stopMenu
             // 
             this.stopMenu.Name = "stopMenu";
-            this.stopMenu.Size = new System.Drawing.Size(112, 22);
+            this.stopMenu.Size = new System.Drawing.Size(126, 22);
             this.stopMenu.Text = "Stop";
             this.stopMenu.Click += new System.EventHandler(this.Stop_Click);
             // 
@@ -143,9 +157,11 @@
             this.startMenu,
             this.stopMenu,
             this.menuSeparator,
+            this.logAnalysisMenu,
+            this.exitSeparator,
             this.exitMenu});
             this.trayMenu.Name = "trayMenu";
-            this.trayMenu.Size = new System.Drawing.Size(113, 98);
+            this.trayMenu.Size = new System.Drawing.Size(127, 126);
             // 
             // Form1
             // 
@@ -179,6 +195,8 @@
         private System.Windows.Forms.ToolStripMenuItem exitMenu;
         private System.Windows.Forms.TextBox ipInput;
         private System.Windows.Forms.ToolStripSeparator menuSeparator;
+        private System.Windows.Forms.ToolStripMenuItem logAnalysisMenu;
+        private System.Windows.Forms.ToolStripSeparator exitSeparator;
         private System.Windows.Forms.Button start;
         private System.Windows.Forms.ToolStripMenuItem startMenu;
         private System.Windows.Forms.Label status;

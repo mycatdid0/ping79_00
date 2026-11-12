@@ -16,6 +16,7 @@ namespace ping79_00
         private readonly Icon idle = MakeIcon(Color.Gray);
         private readonly Icon success = MakeIcon(Color.RoyalBlue);
         private readonly Icon failure = MakeIcon(Color.Red);
+        private LogAnalysisForm logAnalysisForm;
         public Form1()
         {
             InitializeComponent();
@@ -32,6 +33,15 @@ namespace ping79_00
         private void Exit_Click(object sender, EventArgs e) { ExitApplication(); }
         private void EditIp_Click(object sender, EventArgs e) { ShowMain(true); }
         private void StartMenu_Click(object sender, EventArgs e) { StartMonitoring(); }
+        private void LogAnalysis_Click(object sender, EventArgs e)
+        {
+            if (logAnalysisForm == null || logAnalysisForm.IsDisposed)
+                logAnalysisForm = new LogAnalysisForm();
+            logAnalysisForm.Show(this);
+            if (logAnalysisForm.WindowState == FormWindowState.Minimized)
+                logAnalysisForm.WindowState = FormWindowState.Normal;
+            logAnalysisForm.Activate();
+        }
         private void Tray_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left) ShowMain(false);
