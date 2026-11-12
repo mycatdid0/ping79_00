@@ -52,10 +52,28 @@ namespace ping79_00
         {
             if (logAnalysisForm == null || logAnalysisForm.IsDisposed)
                 logAnalysisForm = new LogAnalysisForm();
-            logAnalysisForm.Show(this);
-            if (logAnalysisForm.WindowState == FormWindowState.Minimized)
-                logAnalysisForm.WindowState = FormWindowState.Normal;
-            logAnalysisForm.Activate();
+
+            // 이미 표시된 폼에 ShowDialog를 다시 호출하면 예외가 발생하므로
+            // 표시 중인 인스턴스는 활성화만 한다.
+            if (logAnalysisForm.Visible)
+            {
+                if (logAnalysisForm.WindowState == FormWindowState.Minimized)
+                    logAnalysisForm.WindowState = FormWindowState.Normal;
+                logAnalysisForm.BringToFront();
+                logAnalysisForm.Activate();
+                return;
+            }
+
+            try
+            {
+                logAnalysisForm.ShowDialog(this);
+            }
+            finally
+            {
+                if (!logAnalysisForm.IsDisposed)
+                    logAnalysisForm.Dispose();
+                logAnalysisForm = null;
+            }
         }
         private void Tray_MouseClick(object sender, MouseEventArgs e)
         {
