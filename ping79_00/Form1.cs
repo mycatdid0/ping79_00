@@ -16,58 +16,32 @@ namespace ping79_00
         private readonly Icon idle = MakeIcon(Color.Gray);
         private readonly Icon success = MakeIcon(Color.RoyalBlue);
         private readonly Icon failure = MakeIcon(Color.Red);
-        private TextBox ipInput;
-        private Label status;
-        private Button start, stop;
-        private ToolStripMenuItem startMenu, stopMenu;
-        private NotifyIcon tray;
-        private Timer timer;
-
         public Form1()
         {
             InitializeComponent();
-            Text = "Ping 상태 모니터";
-            ClientSize = new Size(400, 190);
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            MaximizeBox = false;
-            StartPosition = FormStartPosition.CenterScreen;
-            ipInput = new TextBox { Text = targetIp, Location = new Point(20, 20), Width = 240, AccessibleName = "검사할 IP 주소" };
-            var apply = MakeButton("IP 변경", 275, 18, (s, e) => ApplyIp());
-            start = MakeButton("Start", 20, 65, (s, e) => { if (ApplyIp()) StartMonitoring(); });
-            stop = MakeButton("Stop", 145, 65, (s, e) => StopMonitoring());
-            var exit = MakeButton("종료", 270, 65, (s, e) => ExitApplication());
-            status = new Label { Location = new Point(20, 115), Size = new Size(360, 60) };
-            Controls.Add(ipInput);
-            Controls.Add(status);
-            AcceptButton = apply;
-            var menu = new ContextMenuStrip(components);
-            menu.Items.Add("IP 변경", null, (s, e) => ShowMain(true));
-            startMenu = new ToolStripMenuItem("Start", null, (s, e) => StartMonitoring());
-            stopMenu = new ToolStripMenuItem("Stop", null, (s, e) => StopMonitoring());
-            menu.Items.Add(startMenu);
-            menu.Items.Add(stopMenu);
-            menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Exit", null, (s, e) => ExitApplication());
-            tray = new NotifyIcon(components) { ContextMenuStrip = menu, Icon = idle, Visible = true };
-            tray.MouseClick += (s, e) => { if (e.Button == MouseButtons.Left) ShowMain(false); };
-            timer = new Timer(components) { Interval = 1000 };
-            timer.Tick += async (s, e) => await CheckAsync();
+            ipInput.Text = targetIp;
+            tray.Icon = idle;
+            tray.Visible = true;
             SetStatus(idle, "중지됨");
             UpdateButtons();
-            Shown += (s, e) => StartMonitoring();
-            FormClosing += (s, e) => {
-                if (!exiting && e.CloseReason == CloseReason.UserClosing) { e.Cancel = true; Hide(); }
-            };
         }
 
-        private Button MakeButton(string text, int x, int y, EventHandler handler)
+        private void Apply_Click(object sender, EventArgs e) { ApplyIp(); }
+        private void Start_Click(object sender, EventArgs e) { if (ApplyIp()) StartMonitoring(); }
+        private void Stop_Click(object sender, EventArgs e) { StopMonitoring(); }
+        private void Exit_Click(object sender, EventArgs e) { ExitApplication(); }
+        private void EditIp_Click(object sender, EventArgs e) { ShowMain(true); }
+        private void StartMenu_Click(object sender, EventArgs e) { StartMonitoring(); }
+        private void Tray_MouseClick(object sender, MouseEventArgs e)
         {
-            var button = new Button { Text = text, Location = new Point(x, y), Size = new Size(110, 30) };
-            button.Click += handler;
-            Controls.Add(button);
-            return button;
+            if (e.Button == MouseButtons.Left) ShowMain(false);
         }
-
+        private async void Timer_Tick(object sender, EventArgs e) { await CheckAsync(); }
+        private void Form1_Shown(object sender, EventArgs e) { StartMonitoring(); }
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (!exiting && e.CloseReason == CloseReason.UserClosing) { e.Cancel = true; Hide(); }
+        }
         private bool ApplyIp()
         {
             IPAddress address;
