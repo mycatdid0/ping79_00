@@ -22,7 +22,7 @@
             this.editIpMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.exit = new System.Windows.Forms.Button();
             this.exitMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.ipInput = new System.Windows.Forms.TextBox();
+            this.ipInput = new System.Windows.Forms.ComboBox();
             this.menuSeparator = new System.Windows.Forms.ToolStripSeparator();
             this.logAnalysisMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.exitSeparator = new System.Windows.Forms.ToolStripSeparator();
@@ -74,6 +74,9 @@
             // ipInput
             // 
             this.ipInput.AccessibleName = "검사할 IP 주소";
+            this.ipInput.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
+            this.ipInput.FormattingEnabled = true;
+            this.ipInput.MaxDropDownItems = 10;
             this.ipInput.Location = new System.Drawing.Point(20, 20);
             this.ipInput.Name = "ipInput";
             this.ipInput.Size = new System.Drawing.Size(240, 21);
@@ -193,7 +196,7 @@
         private System.Windows.Forms.ToolStripMenuItem editIpMenu;
         private System.Windows.Forms.Button exit;
         private System.Windows.Forms.ToolStripMenuItem exitMenu;
-        private System.Windows.Forms.TextBox ipInput;
+        private System.Windows.Forms.ComboBox ipInput;
         private System.Windows.Forms.ToolStripSeparator menuSeparator;
         private System.Windows.Forms.ToolStripMenuItem logAnalysisMenu;
         private System.Windows.Forms.ToolStripSeparator exitSeparator;

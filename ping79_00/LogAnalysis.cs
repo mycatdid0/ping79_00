@@ -84,26 +84,15 @@ namespace ping79_00
 
         internal static string Read()
         {
-            if (!File.Exists(SettingsPath))
-            {
-                Save(DefaultFolder);
-                return DefaultFolder;
-            }
-            foreach (string line in File.ReadLines(SettingsPath, Encoding.UTF8))
-            {
-                if (line.StartsWith("Folder=", StringComparison.OrdinalIgnoreCase))
-                {
-                    string folder = line.Substring("Folder=".Length).Trim();
-                    if (!string.IsNullOrEmpty(folder)) return folder;
-                }
-            }
+            string folder = IniSettings.Read(SettingsPath, "LogAnalysis", "Folder");
+            if (!string.IsNullOrWhiteSpace(folder)) return folder;
+            Save(DefaultFolder);
             return DefaultFolder;
         }
 
         internal static void Save(string folder)
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath));
-            File.WriteAllText(SettingsPath, "[LogAnalysis]\r\nFolder=" + folder + "\r\n", Encoding.UTF8);
+            IniSettings.WriteSection(SettingsPath, "LogAnalysis", new[] { "Folder=" + folder });
         }
     }
 }

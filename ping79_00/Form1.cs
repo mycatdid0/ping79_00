@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Drawing;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
@@ -17,9 +20,21 @@ namespace ping79_00
         private readonly Icon success = MakeIcon(Color.RoyalBlue);
         private readonly Icon failure = MakeIcon(Color.Red);
         private LogAnalysisForm logAnalysisForm;
+        private List<string> ipHistory = new List<string>();
+        private string settingsReadError;
         public Form1()
         {
             InitializeComponent();
+            try
+            {
+                ipHistory = IpHistorySettings.Read(LogFolderSettings.SettingsPath);
+                if (ipHistory.Count > 0) targetIp = ipHistory[0];
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            {
+                settingsReadError = ex.Message;
+            }
+            ipInput.Items.AddRange(ipHistory.Cast<object>().ToArray());
             ipInput.Text = targetIp;
             tray.Icon = idle;
             tray.Visible = true;
@@ -47,7 +62,32 @@ namespace ping79_00
             if (e.Button == MouseButtons.Left) ShowMain(false);
         }
         private async void Timer_Tick(object sender, EventArgs e) { await CheckAsync(); }
-        private void Form1_Shown(object sender, EventArgs e) { StartMonitoring(); }
+        private void Form1_Shown(object sender, EventArgs e)
+        {
+            if (settingsReadError != null)
+                MessageBox.Show(this, "IP 기록을 읽지 못했습니다.\r\n" + settingsReadError,
+                    "IP 기록", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            else
+                RememberIp(targetIp);
+            StartMonitoring();
+        }
+
+        private bool RememberIp(string ip)
+        {
+            var updated = IpHistorySettings.Normalize(new[] { ip }.Concat(ipHistory));
+            try { IpHistorySettings.Save(LogFolderSettings.SettingsPath, updated); }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException)
+            {
+                MessageBox.Show(this, "IP 기록을 저장하지 못했습니다.\r\n" + ex.Message,
+                    "IP 기록", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            ipHistory = updated;
+            ipInput.Items.Clear();
+            ipInput.Items.AddRange(ipHistory.Cast<object>().ToArray());
+            ipInput.Text = ip;
+            return true;
+        }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (!exiting && e.CloseReason == CloseReason.UserClosing) { e.Cancel = true; Hide(); }
@@ -62,7 +102,7 @@ namespace ping79_00
                 ipInput.SelectAll();
                 return false;
             }
-            ipInput.Text = address.ToString();
+            if (!RememberIp(address.ToString())) return false;
             if (targetIp == ipInput.Text) return true;
             targetIp = ipInput.Text;
             generation++;
