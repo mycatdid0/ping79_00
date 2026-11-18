@@ -8,6 +8,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>ping79_00</RootNamespace>
     <AssemblyName>ping79_00</AssemblyName>
+    <ApplicationIcon>PingMonitor.ico</ApplicationIcon>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -46,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="PingMonitor.ico" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>

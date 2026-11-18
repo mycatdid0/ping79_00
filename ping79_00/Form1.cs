@@ -25,6 +25,7 @@ namespace ping79_00
         public Form1()
         {
             InitializeComponent();
+            Icon = Program.WindowIcon;
             try
             {
                 ipHistory = IpHistorySettings.Read(LogFolderSettings.SettingsPath);

@@ -15,6 +15,7 @@ namespace ping79_00
         public LogAnalysisForm()
         {
             InitializeComponent();
+            Icon = Program.WindowIcon;
             components.Add(folderDialog);
         }
 
