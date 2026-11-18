@@ -59,9 +59,16 @@ namespace ping79_00
 
         internal static List<string> Load(string folder)
         {
+            DateTime? latestWriteTimeUtc;
+            return LoadWithTimestamp(folder, out latestWriteTimeUtc);
+        }
+
+        internal static List<string> LoadWithTimestamp(string folder, out DateTime? latestWriteTimeUtc)
+        {
             var files = new DirectoryInfo(folder).GetFiles()
                 .OrderByDescending(file => file.LastWriteTimeUtc)
                 .ThenBy(file => file.Name, StringComparer.OrdinalIgnoreCase).Take(10).ToList();
+            latestWriteTimeUtc = files.FirstOrDefault()?.LastWriteTimeUtc;
             var results = new List<string>();
             foreach (var file in files)
             {
@@ -70,6 +77,12 @@ namespace ping79_00
                 catch (UnauthorizedAccessException ex) { results.Add("FILE: " + file.FullName + "\r\n읽기 실패: " + ex.Message); }
             }
             return results;
+        }
+
+        internal static bool HasNewerFile(string folder, DateTime? latestWriteTimeUtc)
+        {
+            return new DirectoryInfo(folder).EnumerateFiles().Any(file =>
+                !latestWriteTimeUtc.HasValue || file.LastWriteTimeUtc > latestWriteTimeUtc.Value);
         }
     }
 

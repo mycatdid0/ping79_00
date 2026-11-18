@@ -11,12 +11,21 @@ namespace ping79_00
     {
         private string folder = LogFolderSettings.DefaultFolder;
         private int loadVersion;
+        private DateTime? latestWriteTimeUtc;
+        private readonly Timer checkTimer;
+        private readonly Timer blinkTimer;
+        private readonly Color reloadBackColor;
 
         public LogAnalysisForm()
         {
             InitializeComponent();
             Icon = Program.WindowIcon;
             components.Add(folderDialog);
+            reloadBackColor = reloadMenu.BackColor;
+            checkTimer = new Timer(components) { Interval = 5000 };
+            blinkTimer = new Timer(components) { Interval = 500 };
+            checkTimer.Tick += CheckTimer_Tick;
+            blinkTimer.Tick += BlinkTimer_Tick;
         }
 
         private async void LogAnalysisForm_Shown(object sender, EventArgs e)
@@ -51,11 +60,16 @@ namespace ping79_00
         {
             int version = ++loadVersion;
             string loadingFolder = folder;
+            checkTimer.Stop();
+            SetReloadAlert(false);
+            latestWriteTimeUtc = null;
             folderStatus.Text = loadingFolder + " — 로딩 중...";
             ClearResults();
             try
             {
-                List<string> results = await Task.Run(() => LogAnalysis.Load(loadingFolder));
+                DateTime? loadedWriteTimeUtc = null;
+                List<string> results = await Task.Run(() =>
+                    LogAnalysis.LoadWithTimestamp(loadingFolder, out loadedWriteTimeUtc));
                 if (IsDisposed || Disposing || version != loadVersion) return;
                 resultsPanel.SuspendLayout();
                 try
@@ -83,6 +97,7 @@ namespace ping79_00
                     resultsPanel.AutoScrollPosition = Point.Empty;
                 }
                 finally { resultsPanel.ResumeLayout(); }
+                latestWriteTimeUtc = loadedWriteTimeUtc;
                 folderStatus.Text = loadingFolder + " — " + results.Count + "개 파일" +
                     (results.Count == 0 ? " (파일 없음)" : "");
             }
@@ -92,6 +107,57 @@ namespace ping79_00
                 if (IsDisposed || Disposing || version != loadVersion) return;
                 folderStatus.Text = loadingFolder + " — 로딩 실패";
                 MessageBox.Show(this, "로그를 로딩하지 못했습니다.\r\n" + ex.Message,
+            finally
+            {
+                if (!IsDisposed && !Disposing && version == loadVersion)
+                    checkTimer.Start();
+            }
+        }
+
+        private async void CheckTimer_Tick(object sender, EventArgs e)
+        {
+            checkTimer.Stop();
+            int version = loadVersion;
+            string checkingFolder = folder;
+            DateTime? displayedWriteTimeUtc = latestWriteTimeUtc;
+            try
+            {
+                bool hasNewerFile = await Task.Run(() =>
+                    LogAnalysis.HasNewerFile(checkingFolder, displayedWriteTimeUtc));
+                if (!IsDisposed && !Disposing && version == loadVersion)
+                    SetReloadAlert(hasNewerFile);
+            }
+            catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException ||
+                ex is ArgumentException || ex is NotSupportedException)
+            {
+                // Retry on the next tick if the folder is temporarily unavailable.
+            }
+            finally
+            {
+                if (!IsDisposed && !Disposing && version == loadVersion)
+                    checkTimer.Start();
+            }
+        }
+
+        private void SetReloadAlert(bool hasNewerFile)
+        {
+            if (hasNewerFile)
+            {
+                if (blinkTimer.Enabled) return;
+                reloadMenu.BackColor = Color.Gold;
+                blinkTimer.Start();
+            }
+            else
+            {
+                blinkTimer.Stop();
+                reloadMenu.BackColor = reloadBackColor;
+            }
+        }
+
+        private void BlinkTimer_Tick(object sender, EventArgs e)
+        {
+            reloadMenu.BackColor = reloadMenu.BackColor == reloadBackColor
+                ? Color.Gold : reloadBackColor;
                     "로그 분석", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
