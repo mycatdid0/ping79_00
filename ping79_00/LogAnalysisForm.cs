@@ -86,20 +86,18 @@ namespace ping79_00
                             Text = text,
                             AccessibleName = text.Split('\r', '\n')[0]
                         };
-                        // Include room for the border, internal padding, and horizontal scrollbar
-                        // so the last line is not clipped.
-                        int lineCount = Math.Max(1, box.Lines.Length);
-                        box.Height = checked(lineCount * (box.Font.Height + 1) +
-                            SystemInformation.HorizontalScrollBarHeight + 16);
+                        // Include room for the border and horizontal scrollbar.
+                        box.Height = checked(box.Lines.Length * box.Font.Height +
+                            SystemInformation.HorizontalScrollBarHeight + 8);
                         resultsPanel.Controls.Add(box);
                     }
                     LayoutResults();
                     resultsPanel.AutoScrollPosition = Point.Empty;
                 }
                 finally { resultsPanel.ResumeLayout(); }
-                latestWriteTimeUtc = loadedWriteTimeUtc;
                 folderStatus.Text = loadingFolder + " — " + results.Count + "개 파일" +
                     (results.Count == 0 ? " (파일 없음)" : "");
+                latestWriteTimeUtc = loadedWriteTimeUtc;
             }
             catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException ||
                 ex is ArgumentException || ex is NotSupportedException)
@@ -107,6 +105,8 @@ namespace ping79_00
                 if (IsDisposed || Disposing || version != loadVersion) return;
                 folderStatus.Text = loadingFolder + " — 로딩 실패";
                 MessageBox.Show(this, "로그를 로딩하지 못했습니다.\r\n" + ex.Message,
+                    "로그 분석", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
             finally
             {
                 if (!IsDisposed && !Disposing && version == loadVersion)
@@ -158,8 +158,6 @@ namespace ping79_00
         {
             reloadMenu.BackColor = reloadMenu.BackColor == reloadBackColor
                 ? Color.Gold : reloadBackColor;
-                    "로그 분석", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
         }
 
         private void ClearResults()
@@ -173,7 +171,6 @@ namespace ping79_00
 
         private void LayoutResults()
         {
-            resultsPanel.AutoScroll = true;
             int height = resultsPanel.Padding.Vertical;
             foreach (Control box in resultsPanel.Controls) height += box.Height + 8;
             int width = Math.Max(1, resultsPanel.Width - resultsPanel.Padding.Horizontal -
