@@ -77,7 +77,8 @@ namespace ping79_00
         }
         private void Tray_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left) ShowMain(false);
+            if (e.Button == MouseButtons.Left)
+                trayMenu.Show(Cursor.Position);
         }
         private async void Timer_Tick(object sender, EventArgs e) { await CheckAsync(); }
         private void Form1_Shown(object sender, EventArgs e)
